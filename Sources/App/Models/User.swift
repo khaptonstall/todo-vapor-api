@@ -23,7 +23,7 @@ final class User: Codable {
 
 extension User {
 
-    final class Public: Codable {
+    final class Public: Codable, Content {
         
         var id: UUID?
         var username: String
@@ -84,3 +84,7 @@ extension User: TokenAuthenticatable {
     typealias TokenType = Token
     
 }
+
+// MARK: - PasswordAuthenticatable
+
+extension User: PasswordAuthenticatable {}
