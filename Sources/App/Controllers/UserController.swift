@@ -43,7 +43,7 @@ struct UserController: RouteCollection {
     
     func getTodosHandler(_ req: Request) throws -> Future<[Todo]> {
         let authenticatedUserID = try req.requireAuthenticated(User.self).requireID()
-        let filterByIsCompleted = (try? req.query.get(Bool.self, at: "is_completed")) ?? false
+        let filterByIsCompleted = (try? req.query.get(Bool.self, at: "isCompleted")) ?? false
         
         return try req.parameters
             .next(User.self)
