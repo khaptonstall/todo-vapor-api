@@ -43,6 +43,7 @@ struct UserController: RouteCollection {
     
     func getTodosHandler(_ req: Request) throws -> Future<[Todo]> {
         let authenticatedUserID = try req.requireAuthenticated(User.self).requireID()
+        let filterByIsCompleted = (try? req.query.get(Bool.self, at: "is_completed")) ?? false
         
         return try req.parameters
             .next(User.self)
@@ -52,7 +53,14 @@ struct UserController: RouteCollection {
                     throw Abort(.unauthorized)
                 }
                 
-                return try requestedUser.todos.query(on: req).all()
+                if filterByIsCompleted {
+                    return try requestedUser.todos
+                        .query(on: req)
+                        .filter(\.isCompleted == filterByIsCompleted)
+                        .all()
+                } else {
+                    return try requestedUser.todos.query(on: req).all()
+                }
             }
     }
 }
