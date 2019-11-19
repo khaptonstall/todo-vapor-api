@@ -12,7 +12,18 @@ struct UserController: RouteCollection {
         basicAuthGroup.post("login", use: loginHandler)
         
         usersRoute.post(CreateUserData.self, use: createHandler)
+        
+        let tokenAuthMiddleware = User.tokenAuthMiddleware()
+        let guardAuthMiddleware = User.guardAuthMiddleware()
+        let tokenAuthGroup = usersRoute.grouped([
+            tokenAuthMiddleware,
+            guardAuthMiddleware
+        ])
+        
+        tokenAuthGroup.get(User.parameter, "todos", use: getTodosHandler)
     }
+    
+    // MARK: Registration/Login
     
     func createHandler(_ req: Request, data: CreateUserData) throws -> Future<Token> {
         let password = try BCrypt.hash(data.password)
@@ -26,6 +37,23 @@ struct UserController: RouteCollection {
         let user = try req.requireAuthenticated(User.self)
         let token = try Token.generate(for: user)
         return token.save(on: req)
+    }
+    
+    // MARK: Fetching Todos
+    
+    func getTodosHandler(_ req: Request) throws -> Future<[Todo]> {
+        let authenticatedUserID = try req.requireAuthenticated(User.self).requireID()
+        
+        return try req.parameters
+            .next(User.self)
+            .flatMap(to: [Todo].self) { requestedUser in
+                let requestedUserID = try requestedUser.requireID()
+                guard requestedUserID == authenticatedUserID else {
+                    throw Abort(.unauthorized)
+                }
+                
+                return try requestedUser.todos.query(on: req).all()
+            }
     }
 }
 

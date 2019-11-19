@@ -10,6 +10,10 @@ final class User: Codable {
     var username: String
     var password: String
     
+    var todos: Children<User, Todo> {
+        return children(\.userID)
+    }
+    
     // MARK: Initialization
     
     init(username: String, password: String) {
