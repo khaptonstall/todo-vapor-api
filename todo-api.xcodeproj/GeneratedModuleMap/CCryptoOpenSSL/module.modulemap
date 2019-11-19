@@ -1,0 +1,4 @@
+module CCryptoOpenSSL {
+    umbrella "/Users/kyle.haptonstall/Developer/Vapor/todo-vapor-api/.build/checkouts/crypto/Sources/CCryptoOpenSSL/include"
+    export *
+}

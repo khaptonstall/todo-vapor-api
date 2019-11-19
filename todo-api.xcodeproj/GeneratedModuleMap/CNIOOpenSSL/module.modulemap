@@ -1,0 +1,4 @@
+module CNIOOpenSSL {
+    umbrella "/Users/kyle.haptonstall/Developer/Vapor/todo-vapor-api/.build/checkouts/swift-nio-ssl/Sources/CNIOOpenSSL/include"
+    export *
+}
