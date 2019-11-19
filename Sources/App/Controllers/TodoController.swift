@@ -15,7 +15,10 @@ struct TodoController: RouteCollection {
         ])
         
         tokenAuthGroup.post(use: createTodoHandler)
+        tokenAuthGroup.patch(Todo.parameter, use: updateTodoHandler)
     }
+    
+    // MARK: Creating Todos
     
     func createTodoHandler(_ req: Request) throws -> Future<Todo> {
         let user = try req.requireAuthenticated(User.self)
@@ -25,4 +28,26 @@ struct TodoController: RouteCollection {
         }
     }
     
+    // MARK: Updating Todos
+    
+    func updateTodoHandler(_ req: Request) throws -> Future<Todo> {
+        return try flatMap(to: Todo.self,
+                           req.parameters.next(Todo.self),
+                           req.content.decode(UpdateTodoData.self)) { todo, updates in
+                            if let title = updates.title, !title.isEmpty {
+                                todo.title = title
+                            }
+                            if let isCompleted = updates.isCompleted {
+                                todo.isCompleted = isCompleted
+                            }
+                            
+                            return todo.save(on: req)
+        }
+    }
+    
+}
+
+struct UpdateTodoData: Content {
+    var title: String?
+    var isCompleted: Bool?
 }

@@ -37,3 +37,7 @@ extension Todo: Migration {}
 // MARK: - Content
 
 extension Todo: Content {}
+
+// MARK: - Parameter
+
+extension Todo: Parameter {}
