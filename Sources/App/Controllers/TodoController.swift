@@ -20,18 +20,18 @@ struct TodoController: RouteCollection {
     
     // MARK: Creating Todos
     
-    func createTodoHandler(_ req: Request) throws -> Future<Todo> {
+    func createTodoHandler(_ req: Request) throws -> FutureAPIResponse<Todo> {
         let user = try req.requireAuthenticated(User.self)
-        return req.content.get(String.self, at: "title").flatMap(to: Todo.self) { title in
+        return req.content.get(String.self, at: "title").flatMap(to: APIResponse<Todo>.self) { title in
             let todo = try Todo(title: title, userID: user.requireID())
-            return todo.save(on: req)
+            return todo.save(on: req).toAPIResponse()
         }
     }
     
     // MARK: Updating Todos
     
-    func updateTodoHandler(_ req: Request) throws -> Future<Todo> {
-        return try flatMap(to: Todo.self,
+    func updateTodoHandler(_ req: Request) throws -> FutureAPIResponse<Todo> {
+        return try flatMap(to: APIResponse<Todo>.self,
                            req.parameters.next(Todo.self),
                            req.content.decode(UpdateTodoData.self)) { todo, updates in
                             if let title = updates.title, !title.isEmpty {
@@ -41,7 +41,7 @@ struct TodoController: RouteCollection {
                                 todo.isCompleted = isCompleted
                             }
                             
-                            return todo.save(on: req)
+                            return todo.save(on: req).toAPIResponse()
         }
     }
     
