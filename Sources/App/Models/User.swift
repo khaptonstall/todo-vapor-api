@@ -6,7 +6,7 @@ final class User: Codable {
     
     // MARK: Properties
     
-    var id: UUID?
+    var id: Int?
     var username: String
     var password: String
     
@@ -29,10 +29,10 @@ extension User {
 
     final class Public: Codable, Content {
         
-        var id: UUID?
+        var id: Int?
         var username: String
         
-        init(id: UUID?, username: String) {
+        init(id: Int?, username: String) {
             self.id = id
             self.username = username
         }
@@ -47,7 +47,7 @@ extension User {
 
 // MARK: - PostgreSQLUUIDModel
 
-extension User: PostgreSQLUUIDModel {}
+extension User: PostgreSQLModel {}
 
 // MARK: - Content
 

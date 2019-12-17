@@ -6,7 +6,7 @@ final class Token: Codable {
     
     // MARK: Properties
     
-    var id: UUID?
+    var id: Int?
     var token: String
     var userID: User.ID
     
@@ -21,7 +21,7 @@ final class Token: Codable {
 
 // MARK: - PostgreSQLUUIDModel
 
-extension Token: PostgreSQLUUIDModel {}
+extension Token: PostgreSQLModel {}
 
 // MARK: - Content
 
