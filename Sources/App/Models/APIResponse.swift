@@ -1,10 +1,3 @@
-//
-//  APIResponse.swift
-//  App
-//
-//  Created by Kyle Haptonstall on 12/17/19.
-//
-
 import Foundation
 import Vapor
 
