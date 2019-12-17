@@ -25,29 +25,33 @@ struct UserController: RouteCollection {
     
     // MARK: Registration/Login
     
-    func createHandler(_ req: Request, data: CreateUserData) throws -> Future<Token> {
+    func createHandler(_ req: Request, data: CreateUserData) throws -> FutureAPIResponse<Token> {
         let password = try BCrypt.hash(data.password)
         let user = User(username: data.username, password: password)
-        return user.save(on: req).flatMap(to: Token.self) { user in
-            return try Token.generate(for: user).save(on: req)
+        return user.save(on: req).flatMap(to: APIResponse<Token>.self) { user in
+            return try Token.generate(for: user).save(on: req).map(to: APIResponse<Token>.self, { token in
+                return APIResponse<Token>(data: token)
+            })
         }
     }
-    
-    func loginHandler(_ req: Request) throws -> Future<Token> {
+
+    func loginHandler(_ req: Request) throws -> FutureAPIResponse<Token> {
         let user = try req.requireAuthenticated(User.self)
         let token = try Token.generate(for: user)
-        return token.save(on: req)
+        return token.save(on: req).map(to: APIResponse<Token>.self) { token in
+            return APIResponse<Token>(data: token)
+        }
     }
     
     // MARK: Fetching Todos
     
-    func getTodosHandler(_ req: Request) throws -> Future<[Todo]> {
+    func getTodosHandler(_ req: Request) throws -> FutureAPIResponse<[Todo]> {
         let authenticatedUserID = try req.requireAuthenticated(User.self).requireID()
         let filterByIsCompleted = (try? req.query.get(Bool.self, at: "isCompleted")) ?? false
         
         return try req.parameters
             .next(User.self)
-            .flatMap(to: [Todo].self) { requestedUser in
+            .flatMap(to: APIResponse<[Todo]>.self) { requestedUser in
                 let requestedUserID = try requestedUser.requireID()
                 guard requestedUserID == authenticatedUserID else {
                     throw Abort(.unauthorized)
@@ -57,9 +61,11 @@ struct UserController: RouteCollection {
                     return try requestedUser.todos
                         .query(on: req)
                         .filter(\.isCompleted == filterByIsCompleted)
-                        .all()
+                        .all().map(to: APIResponse<[Todo]>.self, { todos in
+                            return APIResponse<[Todo]>(data: todos)
+                        })
                 } else {
-                    return try requestedUser.todos.query(on: req).all()
+                    return try requestedUser.todos.query(on: req).all().toAPIResponse()
                 }
             }
     }
