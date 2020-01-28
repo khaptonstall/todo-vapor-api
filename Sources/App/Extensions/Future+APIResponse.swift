@@ -1,10 +1,3 @@
-//
-//  Future+APIResponse.swift
-//  App
-//
-//  Created by Kyle Haptonstall on 1/28/20.
-//
-
 import Foundation
 import Vapor
 
