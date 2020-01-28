@@ -26,6 +26,9 @@ struct UserController: RouteCollection {
     // MARK: Registration/Login
     
     func createHandler(_ req: Request, data: CreateUserData) throws -> FutureAPIResponse<Token> {
+        // Validate the data first
+        try data.validate()
+        
         let password = try BCrypt.hash(data.password)
         let user = User(username: data.username, password: password)
         return user.save(on: req).flatMap(to: APIResponse<Token>.self) { user in
