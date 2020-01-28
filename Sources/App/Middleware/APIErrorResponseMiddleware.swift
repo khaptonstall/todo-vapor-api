@@ -42,6 +42,10 @@ final class APIErrorResponseMiddleware: Middleware {
                 status = .badRequest
                 title = "Validation Error"
                 message = validationError.reason
+            case let multipartError as MultipartError:
+                status = .badRequest
+                title = MultipartError.readableName
+                message = multipartError.reason
             default:
                 status = .internalServerError
                 title = "Internal Server Error"
