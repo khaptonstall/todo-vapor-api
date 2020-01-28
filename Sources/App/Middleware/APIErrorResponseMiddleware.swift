@@ -18,7 +18,6 @@ final class APIErrorResponseMiddleware: Middleware {
     
     private let closure: ErrorResponseClosure
     
-    
     /// Creates a `APIErrorResponseMiddleware`.
     /// - Parameter closure: The closure to execute when the request results in an error.
     init(_ closure: @escaping ErrorResponseClosure) {
